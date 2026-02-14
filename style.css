@@ -1,0 +1,133 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg-main: #09090b;
+  --bg-card: #121215;
+  --border-dim: #1e1e21;    /* 少し明るくして境界を明確に */
+  --border-mid: #27272a;
+  --border-active: #71717a; /* ホバー時の線をよりはっきりと */
+
+  /* 文字色のコントラストを向上 */
+  --text-main: #ffffff;
+  --text-sub: #e4e4e7;      /* カードタイトルの基本色 (zinc-200) */
+  --text-muted: #a1a1aa;    /* 補助情報の文字 (zinc-400) - 以前より明るい */
+  --text-dim: #71717a;      /* 非常に細かい情報の文字 (zinc-500) */
+  --accent: #ffffff;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.board-container { min-width: 1200px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { height: 6px; width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 10px; }
+
+/* Header Styles */
+.app-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-mid);
+  padding-bottom: 1.5rem;
+}
+
+.title-main { font-size: 1.25rem; font-weight: 300; color: white; }
+.title-sub { font-size: 0.75rem; color: var(--text-dim); margin-left: 0.5rem; font-family: monospace; }
+
+/* Column Styles */
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-mid);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.column-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted); /* ここを明るくしました */
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.column-count { font-size: 9px; font-family: monospace; color: var(--text-muted); }
+
+/* Task Card Styles */
+.task-card {
+  padding: 0.85rem; /* 少しだけ余裕を持たせて視認性アップ */
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.task-card:hover {
+  border-color: var(--border-active);
+  background-color: #18181b; /* ホバー時にわずかに背景を明るく */
+}
+
+.task-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.task-key { font-size: 10px; font-family: monospace; color: var(--text-dim); font-weight: 500; }
+.task-priority-dot { width: 5px; height: 5px; background-color: var(--accent); border-radius: 50%; }
+
+.task-title {
+  font-size: 13px; /* 12pxから1px拡大 */
+  font-weight: 400;
+  color: var(--text-sub);
+  line-height: 1.4; /* 行間を広げて読みやすく */
+}
+
+.task-card:hover .task-title { color: white; }
+
+.task-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* 透明度を40%から60%へ上げて、最初から読みやすく */
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.task-card:hover .task-footer { opacity: 1; }
+.task-assignee, .task-date { font-size: 10px; font-family: monospace; color: var(--text-muted); }
+
+/* Utility */
+.empty-state {
+  height: 5rem;
+  border: 1px dashed var(--border-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.btn-new {
+  padding: 0.45rem 1.2rem;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: var(--text-main);
+  color: black;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: opacity 0.2s;
+}
+.btn-new:hover { opacity: 0.9; }

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Board - Separated</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="app" class="board-container">
+  <header class="app-header">
+    <h1 class="title-main">Engineering Sprint <span class="title-sub">2026-Q1</span></h1>
+    <div class="flex items-center gap-4">
+      <span class="text-[9px] text-zinc-600 font-mono">ENCRYPTED SESSION</span>
+      <button @click="addTask" class="btn-new">New Ticket</button>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-5 gap-4">
+    <div v-for="col in columns" :key="col.id" class="flex flex-col">
+      <div class="column-header">
+        <h2 class="column-title">{{ col.name }}</h2>
+        <span class="column-count">{{ getTasksByStatus(col.id).length }}</span>
+      </div>
+
+      <div class="min-h-[70vh]">
+        <div
+          v-for="task in getTasksByStatus(col.id)"
+          :key="task.id"
+          @click="nextStatus(task)"
+          class="task-card"
+        >
+          <div class="task-meta">
+            <span class="task-key">{{ task.key }}</span>
+            <div v-if="task.priority === 'high'" class="task-priority-dot"></div>
+          </div>
+          <h3 class="task-title">{{ task.title }}</h3>
+          <div class="task-footer">
+            <div class="task-assignee">{{ task.assignee }}</div>
+            <div class="task-date">{{ task.dueDate }}</div>
+          </div>
+        </div>
+
+        <div v-if="getTasksByStatus(col.id).length === 0" class="empty-state">
+            No Items
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const { createApp, ref } = Vue
+  createApp({
+    setup() {
+      const columns = [
+        { id: 'backlog', name: 'Backlog' },
+        { id: 'todo', name: 'To Do' },
+        { id: 'in-progress', name: 'In Progress' },
+        { id: 'review', name: 'Review' },
+        { id: 'done', name: 'Done' }
+      ]
+      const tasks = ref([
+        { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20' },
+        { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13' },
+        { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18' },
+        { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10' },
+        { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12' },
+        { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25' },
+        { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14' },
+        { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19' },
+        { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
+         { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
+          { id: 11, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
+           { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' }
+      ])
+      const getTasksByStatus = (status) => tasks.value.filter(t => t.status === status)
+      const nextStatus = (task) => {
+        const flow = ['backlog', 'todo', 'in-progress', 'review', 'done']
+        task.status = flow[(flow.indexOf(task.status) + 1) % flow.length]
+      }
+      const addTask = () => {
+        const title = prompt("Task Description")
+        if (title) {
+          tasks.value.push({
+            id: Date.now(),
+            key: `NEW-${tasks.value.length + 1}`,
+            title,
+            status: 'backlog',
+            priority: 'medium',
+            assignee: 'ME',
+            dueDate: '02.28'
+          })
+        }
+      }
+      return { columns, tasks, getTasksByStatus, nextStatus, addTask }
+    }
+  }).mount('#app')
+</script>
+</body>
+</html>
