@@ -22,10 +22,26 @@ body {
   font-family: 'Inter', sans-serif;
   letter-spacing: -0.01em;
   margin: 0;
-  padding: 1.5rem;
+  padding: 1rem; /* スマホ向けに少し縮小 */
 }
 
-.board-container { min-width: 1200px; }
+/* PC向けにパディングを戻す */
+@media (min-width: 768px) {
+  body {
+    padding: 1.5rem;
+  }
+}
+
+.board-container {
+  width: 100%;
+}
+
+/* PC以上の画面では十分な幅を確保 */
+@media (min-width: 1024px) {
+  .board-container {
+    min-width: 1200px;
+  }
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar { height: 6px; width: 4px; }
@@ -33,12 +49,12 @@ body {
 
 /* Header Styles */
 .app-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-mid);
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
 }
 
 .title-main { font-size: 1.25rem; font-weight: 300; color: white; }
@@ -66,12 +82,12 @@ body {
 
 /* Task Card Styles */
 .task-card {
-  padding: 0.85rem; /* 少しだけ余裕を持たせて視認性アップ */
+  padding: 1rem; /* タッチ操作しやすいように少し拡大 */
   background-color: var(--bg-card);
   border: 1px solid var(--border-mid);
   transition: all 0.2s ease;
   cursor: pointer;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .task-card:hover {
@@ -81,13 +97,13 @@ body {
 
 .task-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .task-key { font-size: 10px; font-family: monospace; color: var(--text-dim); font-weight: 500; }
-.task-priority-dot { width: 5px; height: 5px; background-color: var(--accent); border-radius: 50%; }
+.task-priority-dot { width: 6px; height: 6px; background-color: var(--accent); border-radius: 50%; }
 
 .task-title {
-  font-size: 13px; /* 12pxから1px拡大 */
+  font-size: 14px; /* モバイルでの可読性向上のため拡大 */
   font-weight: 400;
   color: var(--text-sub);
-  line-height: 1.4; /* 行間を広げて読みやすく */
+  line-height: 1.5; /* 行間を広げて読みやすく */
 }
 
 .task-card:hover .task-title { color: white; }
@@ -98,12 +114,12 @@ body {
   justify-content: space-between;
   align-items: center;
   /* 透明度を40%から60%へ上げて、最初から読みやすく */
-  opacity: 0.6;
+  opacity: 0.7;
   transition: opacity 0.2s;
 }
 
 .task-card:hover .task-footer { opacity: 1; }
-.task-assignee, .task-date { font-size: 10px; font-family: monospace; color: var(--text-muted); }
+.task-assignee, .task-date { font-size: 11px; font-family: monospace; color: var(--text-muted); }
 
 /* Utility */
 .empty-state {
@@ -119,7 +135,7 @@ body {
 }
 
 .btn-new {
-  padding: 0.45rem 1.2rem;
+  padding: 0.5rem 1.2rem; /* タップ領域確保 */
   font-size: 11px;
   font-weight: 600;
   background-color: var(--text-main);
@@ -145,25 +161,33 @@ body {
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(2px);
+  padding: 1rem; /* エッジの余白 */
+  box-sizing: border-box;
 }
 
 .modal-content {
   background-color: var(--bg-card);
   border: 1px solid var(--border-mid);
-  width: 500px;
-  max-width: 90vw;
+  width: 100%;
+  max-width: 500px; /* デフォルトは最大500px */
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
+  max-height: 90vh; /* 縦長画面ではスクロール可能に */
+  overflow-y: auto;
 }
 
 .modal-header {
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--border-mid);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-card);
+  z-index: 10;
 }
 
 .modal-title {
@@ -177,10 +201,11 @@ body {
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 1.5rem;
+  font-size: 1.75rem; /* タップしやすく大きく */
   line-height: 1;
   cursor: pointer;
-  padding: 0;
+  padding: 0.5rem; /* タップ領域拡大 */
+  margin: -0.5rem; /* レイアウト崩れ防止 */
 }
 
 .modal-close:hover {
@@ -188,7 +213,8 @@ body {
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 1.25rem;
+  overflow-y: auto;
 }
 
 .form-group {
@@ -198,6 +224,13 @@ body {
 .form-row {
   display: flex;
   gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
 
 .form-row .form-group {
@@ -214,12 +247,12 @@ label {
 
 .form-input, .form-select, .form-textarea {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.75rem; /* スマホで入力しやすいように拡大 */
   background-color: var(--bg-main);
   border: 1px solid var(--border-mid);
   color: var(--text-main);
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px; /* 16px未満だとiOSでズームされることがあるが、全体のバランスを見て14px。meta viewportの設定次第 */
   border-radius: 4px;
   box-sizing: border-box;
   transition: border-color 0.2s;
@@ -235,7 +268,7 @@ label {
 }
 
 .modal-footer {
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-top: 1px solid var(--border-mid);
   display: flex;
   justify-content: flex-end;
@@ -243,16 +276,18 @@ label {
   background-color: #18181b; /* Slightly lighter than card bg */
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+  position: sticky;
+  bottom: 0;
 }
 
 .btn-cancel {
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem; /* タップ領域拡大 */
 }
 
 .btn-cancel:hover {
@@ -265,8 +300,8 @@ label {
   color: black;
   border: none;
   border-radius: 4px;
-  padding: 0.5rem 1.25rem;
-  font-size: 12px;
+  padding: 0.75rem 1.5rem; /* タップ領域拡大 */
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;

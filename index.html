@@ -1,226 +1,229 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
   <title>Minimal Board - Separated</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div id="app" class="board-container">
-  <header class="app-header">
-    <h1 class="title-main">Engineering Sprint <span class="title-sub">2026-Q1</span></h1>
-    <div class="flex items-center gap-4">
-      <span class="text-[9px] text-zinc-600 font-mono">ENCRYPTED SESSION</span>
-      <button @click="addTask" class="btn-new">New Ticket</button>
-    </div>
-  </header>
-
-  <div class="grid grid-cols-5 gap-4">
-    <div v-for="col in columns" :key="col.id" class="flex flex-col">
-      <div class="column-header">
-        <h2 class="column-title">{{ col.name }}</h2>
-        <span class="column-count">{{ getTasksByStatus(col.id).length }}</span>
+  <div id="app" class="board-container">
+    <header class="app-header">
+      <h1 class="title-main">Engineering Sprint <span class="title-sub">2026-Q1</span></h1>
+      <div class="flex items-center gap-4">
+        <span class="text-[9px] text-zinc-600 font-mono hidden sm:inline">ENCRYPTED SESSION</span>
+        <button @click="addTask" class="btn-new">New Ticket</button>
       </div>
+    </header>
 
-      <div class="h-full" @dragover.prevent @drop="onDrop($event, col.id)">
-        <div
-          v-for="task in getTasksByStatus(col.id)"
-          :key="task.id"
-          @click="openModal(task)"
-          class="task-card"
-        >
-          <div class="task-meta">
-            <span class="task-key">{{ task.key }}</span>
-            <div v-if="task.priority === 'high'" class="task-priority-dot"></div>
-          </div>
-          <h3 class="task-title">{{ task.title }}</h3>
-          <div class="task-footer">
-            <div class="task-assignee">{{ task.assignee }}</div>
-            <div class="task-date">{{ task.dueDate }}</div>
-          </div>
+    <!-- Responsive Board Layout: Mobile (Horizontal Scroll) -> Desktop (Grid) -->
+    <div
+      class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 lg:grid lg:grid-cols-5 lg:pb-0 lg:overflow-visible">
+      <div v-for="col in columns" :key="col.id"
+        class="flex flex-col flex-none w-[85vw] snap-center md:w-[45vw] lg:w-auto">
+        <div class="column-header">
+          <h2 class="column-title">{{ col.name }}</h2>
+          <span class="column-count">{{ getTasksByStatus(col.id).length }}</span>
         </div>
 
-        <div v-if="getTasksByStatus(col.id).length === 0" class="empty-state">
+        <div class="h-full" @dragover.prevent @drop="onDrop($event, col.id)">
+          <div v-for="task in getTasksByStatus(col.id)" :key="task.id" @click="openModal(task)" class="task-card">
+            <div class="task-meta">
+              <span class="task-key">{{ task.key }}</span>
+              <div v-if="task.priority === 'high'" class="task-priority-dot"></div>
+            </div>
+            <h3 class="task-title">{{ task.title }}</h3>
+            <div class="task-footer">
+              <div class="task-assignee">{{ task.assignee }}</div>
+              <div class="task-date">{{ task.dueDate }}</div>
+            </div>
+          </div>
+
+          <div v-if="getTasksByStatus(col.id).length === 0" class="empty-state">
             No Items
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal Overlay -->
+    <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ isEditing ? getTaskKey(currentTask) : 'Create Issue' }}</h2>
+          <button @click="closeModal" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Summary</label>
+            <input v-model="currentTask.title" type="text" class="form-input" placeholder="What needs to be done?">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <select v-model="currentTask.status" class="form-select">
+                <option v-for="col in columns" :key="col.id" :value="col.id">{{ col.name }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Priority</label>
+              <select v-model="currentTask.priority" class="form-select">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Assignee</label>
+              <input v-model="currentTask.assignee" type="text" class="form-input" placeholder="Initials">
+            </div>
+            <div class="form-group">
+              <label>Due Date</label>
+              <input v-model="currentTask.dueDate" type="text" class="form-input" placeholder="MM.DD">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea v-model="currentTask.description" class="form-textarea" rows="4"
+              placeholder="Add a description..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="closeModal" class="btn-cancel">Cancel</button>
+          <button @click="saveTask" class="btn-save">{{ isEditing ? 'Save' : 'Create' }}</button>
         </div>
       </div>
     </div>
   </div>
-  <!-- Modal Overlay -->
-  <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">{{ isEditing ? getTaskKey(currentTask) : 'Create Issue' }}</h2>
-        <button @click="closeModal" class="modal-close">&times;</button>
-      </div>
 
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Summary</label>
-          <input v-model="currentTask.title" type="text" class="form-input" placeholder="What needs to be done?">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Status</label>
-            <select v-model="currentTask.status" class="form-select">
-              <option v-for="col in columns" :key="col.id" :value="col.id">{{ col.name }}</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Priority</label>
-            <select v-model="currentTask.priority" class="form-select">
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-           <div class="form-group">
-            <label>Assignee</label>
-            <input v-model="currentTask.assignee" type="text" class="form-input" placeholder="Initials">
-          </div>
-          <div class="form-group">
-            <label>Due Date</label>
-             <input v-model="currentTask.dueDate" type="text" class="form-input" placeholder="MM.DD">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea v-model="currentTask.description" class="form-textarea" rows="4" placeholder="Add a description..."></textarea>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button @click="closeModal" class="btn-cancel">Cancel</button>
-        <button @click="saveTask" class="btn-save">{{ isEditing ? 'Save' : 'Create' }}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  const { createApp, ref } = Vue
-  createApp({
-    setup() {
-      const columns = [
-        { id: 'backlog', name: 'Backlog' },
-        { id: 'todo', name: 'To Do' },
-        { id: 'in-progress', name: 'In Progress' },
-        { id: 'review', name: 'Review' },
-        { id: 'done', name: 'Done' }
-      ]
-      const tasks = ref([
-        { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20' },
-        { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13' },
-        { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18' },
-        { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10' },
-        { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12' },
-        { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25' },
-        { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14' },
-        { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19' },
-        { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
-         { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
+  <script>
+    const { createApp, ref } = Vue
+    createApp({
+      setup() {
+        const columns = [
+          { id: 'backlog', name: 'Backlog' },
+          { id: 'todo', name: 'To Do' },
+          { id: 'in-progress', name: 'In Progress' },
+          { id: 'review', name: 'Review' },
+          { id: 'done', name: 'Done' }
+        ]
+        const tasks = ref([
+          { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20' },
+          { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13' },
+          { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18' },
+          { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10' },
+          { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12' },
+          { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25' },
+          { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14' },
+          { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19' },
+          { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
+          { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
           { id: 11, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
-           { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' }
-      ])
-      const isModalOpen = ref(false)
-      const isEditing = ref(false)
-      const currentTask = ref({
-        id: null,
-        key: '',
-        title: '',
-        status: 'backlog',
-        priority: 'medium',
-        assignee: '',
-        dueDate: '',
-        description: ''
-      })
+          { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' }
+        ])
+        const isModalOpen = ref(false)
+        const isEditing = ref(false)
+        const currentTask = ref({
+          id: null,
+          key: '',
+          title: '',
+          status: 'backlog',
+          priority: 'medium',
+          assignee: '',
+          dueDate: '',
+          description: ''
+        })
 
-      const getTasksByStatus = (status) => tasks.value.filter(t => t.status === status)
+        const getTasksByStatus = (status) => tasks.value.filter(t => t.status === status)
 
-      const getTaskKey = (task) => task.key || 'NEW'
+        const getTaskKey = (task) => task.key || 'NEW'
 
-      const openModal = (task = null) => {
-        if (task) {
-          // Edit mode
-          isEditing.value = true
-          currentTask.value = { ...task } // Clone to avoid direct mutation
-        } else {
-          // Create mode
-          isEditing.value = false
-          currentTask.value = {
-            id: null,
-            key: `NEW-${tasks.value.length + 1}`, // Temporary key
-            title: '',
-            status: 'backlog',
-            priority: 'medium',
-            assignee: 'ME',
-            dueDate: '',
-            description: ''
+        const openModal = (task = null) => {
+          if (task) {
+            // Edit mode
+            isEditing.value = true
+            currentTask.value = { ...task } // Clone to avoid direct mutation
+          } else {
+            // Create mode
+            isEditing.value = false
+            currentTask.value = {
+              id: null,
+              key: `NEW-${tasks.value.length + 1}`, // Temporary key
+              title: '',
+              status: 'backlog',
+              priority: 'medium',
+              assignee: 'ME',
+              dueDate: '',
+              description: ''
+            }
           }
+          isModalOpen.value = true
         }
-        isModalOpen.value = true
-      }
 
-      const closeModal = () => {
-        isModalOpen.value = false
-      }
+        const closeModal = () => {
+          isModalOpen.value = false
+        }
 
-      const saveTask = () => {
-        if (!currentTask.value.title) return alert('Title is required')
+        const saveTask = () => {
+          if (!currentTask.value.title) return alert('Title is required')
 
-        if (isEditing.value) {
-          // Update existing
-          const index = tasks.value.findIndex(t => t.id === currentTask.value.id)
-          if (index !== -1) {
-            tasks.value[index] = { ...currentTask.value }
+          if (isEditing.value) {
+            // Update existing
+            const index = tasks.value.findIndex(t => t.id === currentTask.value.id)
+            if (index !== -1) {
+              tasks.value[index] = { ...currentTask.value }
+            }
+          } else {
+            // Create new
+            tasks.value.push({
+              ...currentTask.value,
+              id: Date.now(),
+              key: `TAS-${tasks.value.length + 100}` // Generate a simpler key
+            })
           }
-        } else {
-          // Create new
-          tasks.value.push({
-            ...currentTask.value,
-            id: Date.now(),
-            key: `TAS-${tasks.value.length + 100}` // Generate a simpler key
-          })
+          closeModal()
         }
-        closeModal()
-      }
 
-      // Kept for backward compatibility if needed, but not used in UI anymore
-      const nextStatus = (task) => {
-        const flow = ['backlog', 'todo', 'in-progress', 'review', 'done']
-        task.status = flow[(flow.indexOf(task.status) + 1) % flow.length]
-      }
+        // Kept for backward compatibility if needed, but not used in UI anymore
+        const nextStatus = (task) => {
+          const flow = ['backlog', 'todo', 'in-progress', 'review', 'done']
+          task.status = flow[(flow.indexOf(task.status) + 1) % flow.length]
+        }
 
-      const addTask = () => {
-        openModal()
-      }
+        const addTask = () => {
+          openModal()
+        }
 
-      return {
-        columns,
-        tasks,
-        getTasksByStatus,
-        nextStatus,
-        addTask,
-        isModalOpen,
-        isEditing,
-        currentTask,
-        openModal,
-        closeModal,
-        saveTask,
-        getTaskKey
+        return {
+          columns,
+          tasks,
+          getTasksByStatus,
+          nextStatus,
+          addTask,
+          isModalOpen,
+          isEditing,
+          currentTask,
+          openModal,
+          closeModal,
+          saveTask,
+          getTaskKey
+        }
       }
-    }
-  }).mount('#app')
-</script>
+    }).mount('#app')
+  </script>
 </body>
+
 </html>
