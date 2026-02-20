@@ -109,8 +109,11 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus } from './logic.js';
+
     const { createApp, ref } = Vue
+
     createApp({
       setup() {
         const columns = [
@@ -147,9 +150,8 @@
           description: ''
         })
 
-        const getTasksByStatus = (status) => tasks.value.filter(t => t.status === status)
+        const getTasksByStatus = (status) => filterTasksByStatus(tasks.value, status)
 
-        const getTaskKey = (task) => task.key || 'NEW'
 
         const openModal = (task = null) => {
           if (task) {
@@ -190,18 +192,17 @@
             // Create new
             tasks.value.push({
               ...currentTask.value,
-              id: Date.now(),
-              key: `TAS-${tasks.value.length + 100}` // Generate a simpler key
+              id: generateTaskId(),
+              key: generateTaskKey(tasks.value.length)
             })
           }
           closeModal()
         }
 
-        // Kept for backward compatibility if needed, but not used in UI anymore
         const nextStatus = (task) => {
-          const flow = ['backlog', 'todo', 'in-progress', 'review', 'done']
-          task.status = flow[(flow.indexOf(task.status) + 1) % flow.length]
+          task.status = getNextStatus(task.status)
         }
+
 
         const addTask = () => {
           openModal()
