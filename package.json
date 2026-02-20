@@ -1,0 +1,13 @@
+{
+  "name": "taskboard-ui-test",
+  "version": "1.0.0",
+  "description": "TaskBoard with Vitest",
+  "main": "logic.js",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
+  }
+}
