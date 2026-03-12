@@ -1,9 +1,7 @@
-import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, moveTaskInArray } from './logic.js';
-
-const { ref } = Vue;
+import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, moveTaskInArray, findTargetPosition } from './logic.js';
 
 export const useTaskApp = () => {
-  // 列とタスクの定義
+  const { ref } = Vue;
   const columns = [
     { id: 'backlog', name: 'Backlog' },
     { id: 'todo', name: 'To Do' },
@@ -43,7 +41,6 @@ export const useTaskApp = () => {
 
   const getTasksByStatus = (status) => filterTasksByStatus(tasks.value, status);
 
-  // ドラッグ＆ドロップ関連のメソッド
   const onDragStart = (taskId) => {
     draggedTaskId.value = taskId;
   };
@@ -51,20 +48,17 @@ export const useTaskApp = () => {
   const onDrop = (event, status, targetTaskId = null) => {
     event.preventDefault();
     if (draggedTaskId.value === null) return;
-
-    // logic.js の純粋関数を使って新しいタスク一覧を計算する
-    tasks.value = moveTaskInArray(
-      tasks.value,
-      draggedTaskId.value,
-      status,
-      targetTaskId
-    );
-
+    tasks.value = moveTaskInArray(tasks.value, draggedTaskId.value, status, targetTaskId);
     draggedTaskId.value = null;
   };
 
+  const quickMove = (taskId, direction) => {
+    const target = findTargetPosition(tasks.value, taskId, direction);
+    if (!target) return;
+    tasks.value = moveTaskInArray(tasks.value, taskId, target.status, target.targetTaskId);
+  };
+
   const openModal = (task = null) => {
-    // ... (rest of the file remains largely the same)
     if (task) {
       isEditing.value = true;
       currentTask.value = { ...task };
@@ -90,7 +84,6 @@ export const useTaskApp = () => {
 
   const saveTask = () => {
     if (!currentTask.value.title) return alert('Title is required');
-
     if (isEditing.value) {
       const index = tasks.value.findIndex(t => t.id === currentTask.value.id);
       if (index !== -1) {
@@ -114,7 +107,6 @@ export const useTaskApp = () => {
     openModal();
   };
 
-
   return {
     columns,
     tasks,
@@ -130,6 +122,7 @@ export const useTaskApp = () => {
     getTaskKey,
     onDragStart,
     onDrop,
-    draggedTaskId
+    draggedTaskId,
+    quickMove
   };
 };

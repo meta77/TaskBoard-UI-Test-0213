@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterTasksByStatus, getTaskKey, generateTaskKey, getNextStatus, moveTaskInArray } from './logic.js';
+import { filterTasksByStatus, getTaskKey, generateTaskKey, getNextStatus, moveTaskInArray, findTargetPosition } from './logic.js';
 
 describe('TaskBoard Logic', () => {
 
@@ -77,6 +77,30 @@ describe('TaskBoard Logic', () => {
       ];
       const result = moveTaskInArray(tasks, 1, 'todo', null);
       expect(result[1].id).toBe(1);
+    });
+  });
+
+  describe('findTargetPosition', () => {
+    const tasks = [
+      { id: 1, status: 'backlog' },
+      { id: 2, status: 'backlog' },
+      { id: 3, status: 'todo' }
+    ];
+
+    it('は、上に移動するターゲットを正しく計算すること', () => {
+      const target = findTargetPosition(tasks, 2, 'up');
+      expect(target.status).toBe('backlog');
+      expect(target.targetTaskId).toBe(1);
+    });
+
+    it('は、一番上のタスクをさらに上に移動できないこと', () => {
+      expect(findTargetPosition(tasks, 1, 'up')).toBeNull();
+    });
+
+    it('は、右のステータスへの移動を正しく計算すること', () => {
+      const target = findTargetPosition(tasks, 1, 'right');
+      expect(target.status).toBe('todo');
+      expect(target.targetTaskId).toBeNull(); // 列移動は最後尾へ
     });
   });
 

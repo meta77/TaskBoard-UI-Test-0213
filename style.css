@@ -102,6 +102,27 @@ body {
   cursor: grabbing;
 }
 
+/* クイック移動ボタン（モバイル用） */
+.move-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.move-btn:active {
+  background-color: var(--border-mid);
+  color: var(--text-main);
+  transform: scale(0.95);
+}
+
 .task-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .task-key { font-size: 10px; font-family: monospace; color: var(--text-dim); font-weight: 500; }
 .task-priority-dot { width: 6px; height: 6px; background-color: var(--accent); border-radius: 50%; }
