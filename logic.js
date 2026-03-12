@@ -63,6 +63,46 @@ export const moveTaskInArray = (tasks, taskId, targetStatus, targetTaskId) => {
   return newTasks;
 };
 
+const columnFlow = ['backlog', 'todo', 'in-progress', 'review', 'done'];
+
+/**
+ * 相対的な方向から移動先を特定する
+ */
+export const findTargetPosition = (tasks, taskId, direction) => {
+  const task = tasks.find(t => t.id === taskId);
+  if (!task) return null;
+
+  const currentStatus = task.status;
+  const sameStatusTasks = tasks.filter(t => t.status === currentStatus);
+  const currentIndex = sameStatusTasks.findIndex(t => t.id === taskId);
+
+  if (direction === 'up') {
+    if (currentIndex <= 0) return null;
+    return { status: currentStatus, targetTaskId: sameStatusTasks[currentIndex - 1].id };
+  }
+
+  if (direction === 'down') {
+    if (currentIndex >= sameStatusTasks.length - 1) return null;
+    const nextTask = sameStatusTasks[currentIndex + 1];
+    // 下に移動する場合「次の次のタスクの前」に挿入する必要があるため、さらに次を探す
+    const nextNextTask = sameStatusTasks[currentIndex + 2];
+    return { status: currentStatus, targetTaskId: nextNextTask ? nextNextTask.id : null };
+  }
+
+  const colIndex = columnFlow.indexOf(currentStatus);
+  if (direction === 'left') {
+    if (colIndex <= 0) return null;
+    return { status: columnFlow[colIndex - 1], targetTaskId: null };
+  }
+
+  if (direction === 'right') {
+    if (colIndex >= columnFlow.length - 1) return null;
+    return { status: columnFlow[colIndex + 1], targetTaskId: null };
+  }
+
+  return null;
+};
+
 /**
  * ステータスを遷移させる
  */

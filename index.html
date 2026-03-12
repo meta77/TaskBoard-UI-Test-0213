@@ -45,6 +45,20 @@
               <div class="task-assignee">{{ task.assignee }}</div>
               <div class="task-date">{{ task.dueDate }}</div>
             </div>
+
+            <!-- モバイル専用：クイック移動ボタン -->
+            <div class="mobile-controls lg:hidden">
+              <div class="flex justify-between items-center mt-3 pt-2 border-t border-zinc-800/50">
+                <div class="flex gap-1">
+                  <button @click.stop="quickMove(task.id, 'left')" class="move-btn">←</button>
+                  <button @click.stop="quickMove(task.id, 'right')" class="move-btn">→</button>
+                </div>
+                <div class="flex gap-1">
+                  <button @click.stop="quickMove(task.id, 'up')" class="move-btn">↑</button>
+                  <button @click.stop="quickMove(task.id, 'down')" class="move-btn">↓</button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div v-if="getTasksByStatus(col.id).length === 0" class="empty-state">

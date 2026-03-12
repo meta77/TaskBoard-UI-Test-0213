@@ -11,6 +11,7 @@ global.Vue = {
 // ブラウザの alert をモック
 global.alert = vi.fn();
 
+// モーション（移動）のテスト用にインポート
 import { useTaskApp } from './app.js';
 
 describe('App Logic (useTaskApp)', () => {
