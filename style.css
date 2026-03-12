@@ -95,6 +95,13 @@ body {
   background-color: #18181b; /* ホバー時にわずかに背景を明るく */
 }
 
+/* ドラッグ中のスタイル */
+.task-card.opacity-50 {
+  opacity: 0.4;
+  border: 1px dashed var(--border-active);
+  cursor: grabbing;
+}
+
 .task-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .task-key { font-size: 10px; font-family: monospace; color: var(--text-dim); font-weight: 500; }
 .task-priority-dot { width: 6px; height: 6px; background-color: var(--accent); border-radius: 50%; }

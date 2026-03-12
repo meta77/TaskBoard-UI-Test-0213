@@ -1,8 +1,9 @@
-import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus } from './logic.js';
+import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, moveTaskInArray } from './logic.js';
 
 const { ref } = Vue;
 
 export const useTaskApp = () => {
+  // 列とタスクの定義
   const columns = [
     { id: 'backlog', name: 'Backlog' },
     { id: 'todo', name: 'To Do' },
@@ -28,6 +29,7 @@ export const useTaskApp = () => {
 
   const isModalOpen = ref(false);
   const isEditing = ref(false);
+  const draggedTaskId = ref(null);
   const currentTask = ref({
     id: null,
     key: '',
@@ -41,7 +43,28 @@ export const useTaskApp = () => {
 
   const getTasksByStatus = (status) => filterTasksByStatus(tasks.value, status);
 
+  // ドラッグ＆ドロップ関連のメソッド
+  const onDragStart = (taskId) => {
+    draggedTaskId.value = taskId;
+  };
+
+  const onDrop = (event, status, targetTaskId = null) => {
+    event.preventDefault();
+    if (draggedTaskId.value === null) return;
+
+    // logic.js の純粋関数を使って新しいタスク一覧を計算する
+    tasks.value = moveTaskInArray(
+      tasks.value,
+      draggedTaskId.value,
+      status,
+      targetTaskId
+    );
+
+    draggedTaskId.value = null;
+  };
+
   const openModal = (task = null) => {
+    // ... (rest of the file remains largely the same)
     if (task) {
       isEditing.value = true;
       currentTask.value = { ...task };
@@ -91,10 +114,6 @@ export const useTaskApp = () => {
     openModal();
   };
 
-  const onDrop = (event, status) => {
-    // Note: Simple mock for onDrop logic if needed,
-    // but the original onDrop wasn't fully defined in setup.
-  };
 
   return {
     columns,
@@ -109,6 +128,8 @@ export const useTaskApp = () => {
     closeModal,
     saveTask,
     getTaskKey,
-    onDrop
+    onDragStart,
+    onDrop,
+    draggedTaskId
   };
 };

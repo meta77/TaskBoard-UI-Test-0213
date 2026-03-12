@@ -33,7 +33,9 @@
         </div>
 
         <div class="h-full" @dragover.prevent @drop="onDrop($event, col.id)">
-          <div v-for="task in getTasksByStatus(col.id)" :key="task.id" @click="openModal(task)" class="task-card">
+          <div v-for="task in getTasksByStatus(col.id)" :key="task.id" @click="openModal(task)" draggable="true"
+            @dragstart="onDragStart(task.id)" @drop.stop="onDrop($event, col.id, task.id)" class="task-card"
+            :class="{ 'opacity-50': draggedTaskId === task.id }">
             <div class="task-meta">
               <span class="task-key">{{ task.key }}</span>
               <div v-if="task.priority === 'high'" class="task-priority-dot"></div>

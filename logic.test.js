@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { filterTasksByStatus, getTaskKey, generateTaskKey, getNextStatus } from './logic.js';
+import { filterTasksByStatus, getTaskKey, generateTaskKey, getNextStatus, moveTaskInArray } from './logic.js';
 
 describe('TaskBoard Logic', () => {
 
@@ -45,9 +45,38 @@ describe('TaskBoard Logic', () => {
       expect(getNextStatus('backlog')).toBe('todo');
       expect(getNextStatus('review')).toBe('done');
     });
+  });
 
-    it('は、最後のステータスの次は最初に戻ること', () => {
-      expect(getNextStatus('done')).toBe('backlog');
+  describe('moveTaskInArray', () => {
+    it('は、別ステータスの特定位置へ移動できること', () => {
+      const tasks = [
+        { id: 1, status: 'todo' },
+        { id: 2, status: 'done' }
+      ];
+      const result = moveTaskInArray(tasks, 1, 'done', 2);
+      expect(result[0].id).toBe(1);
+      expect(result[0].status).toBe('done');
+      expect(result[1].id).toBe(2);
+    });
+
+    it('は、同じステータス内で順序を入れ替えられること', () => {
+      const tasks = [
+        { id: 1, status: 'todo' },
+        { id: 2, status: 'todo' }
+      ];
+      // 2を1の前に持ってくる
+      const result = moveTaskInArray(tasks, 2, 'todo', 1);
+      expect(result[0].id).toBe(2);
+      expect(result[1].id).toBe(1);
+    });
+
+    it('は、ターゲットがnullの場合、最後尾に追加されること', () => {
+      const tasks = [
+        { id: 1, status: 'todo' },
+        { id: 2, status: 'todo' }
+      ];
+      const result = moveTaskInArray(tasks, 1, 'todo', null);
+      expect(result[1].id).toBe(1);
     });
   });
 

@@ -58,4 +58,19 @@ describe('App Logic (useTaskApp)', () => {
     expect(app.tasks.value[app.tasks.value.length - 1].title).toBe('新しいテストタスク');
     expect(app.isModalOpen.value).toBe(false);
   });
+
+  it('ドラッグ＆ドロップでタスクのステータスと順序を更新できること', () => {
+    const taskToMove = app.tasks.value[0]; // SYS-101 (backlog)
+    const targetTask = app.tasks.value[2]; // SEC-042 (todo)
+
+    app.onDragStart(taskToMove.id);
+    // targetTaskの前にドロップ
+    app.onDrop({ preventDefault: () => {} }, 'todo', targetTask.id);
+
+    const movedTask = app.tasks.value.find(t => t.id === taskToMove.id);
+    expect(movedTask.status).toBe('todo');
+    // SEC-042 の前に挿入されているはず
+    const todoTasks = app.tasks.value.filter(t => t.status === 'todo');
+    expect(todoTasks[0].id).toBe(taskToMove.id);
+  });
 });
