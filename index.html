@@ -18,8 +18,10 @@
       <h1 class="title-main">Engineering Sprint <span class="title-sub">2026-Q1</span></h1>
       <div class="flex items-center gap-4">
         <span class="text-[9px] text-zinc-600 font-mono hidden sm:inline">ENCRYPTED SESSION</span>
+        <button @click="openSettingsModal" class="btn-secondary">Settings</button>
         <button @click="addTask" class="btn-new">New Ticket</button>
       </div>
+
     </header>
 
     <!-- Responsive Board Layout: Mobile (Horizontal Scroll) -> Desktop (Grid) -->
@@ -110,16 +112,67 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label>Description</label>
-            <textarea v-model="currentTask.description" class="form-textarea" rows="4"
-              placeholder="Add a description..."></textarea>
+          <div class="form-group" v-for="setting in descriptionSettings" :key="setting.id">
+            <label>{{ setting.title }}</label>
+            <textarea v-model="currentTask.descriptions[setting.id]" class="form-textarea" rows="4"
+              :placeholder="'Add ' + setting.title + '...'"></textarea>
           </div>
         </div>
 
         <div class="modal-footer">
           <button @click="closeModal" class="btn-cancel">Cancel</button>
           <button @click="saveTask" class="btn-save">{{ isEditing ? 'Save' : 'Create' }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal Overlay -->
+    <div v-if="isSettingsModalOpen" class="modal-overlay" @click.self="closeSettingsModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Board Settings</h2>
+          <button @click="closeSettingsModal" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-4">
+            <h3 class="text-zinc-200 font-medium mb-2">Description Fields (Max 3)</h3>
+            <p class="text-zinc-500 text-sm mb-4">Configure custom description fields for cards.</p>
+            
+            <div class="space-y-3">
+              <div v-for="(field, index) in settingsDraft" :key="field.id" class="flex gap-2 items-center">
+                <input 
+                  type="text" 
+                  :value="field.title"
+                  @input="draftUpdateField(field.id, $event.target.value)"
+                  class="form-input flex-1" 
+                  placeholder="Field Title" 
+                />
+                <button 
+                  @click="draftRemoveField(field.id)" 
+                  class="p-2 text-zinc-500 hover:text-red-400 transition-colors"
+                  title="Remove Field"
+                  :disabled="settingsDraft.length <= 1"
+                  :class="{'opacity-50 cursor-not-allowed': settingsDraft.length <= 1}"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <button 
+              v-if="settingsDraft.length < 3"
+              @click="draftAddField" 
+              class="mt-4 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+            >
+              <span>+ Add Field</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="closeSettingsModal" class="btn-cancel">Cancel</button>
+          <button @click="saveSettings" class="btn-save">Save Settings</button>
         </div>
       </div>
     </div>

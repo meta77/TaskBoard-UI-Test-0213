@@ -1,4 +1,9 @@
-import { filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, moveTaskInArray, findTargetPosition } from './logic.js';
+import { 
+  filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, 
+  moveTaskInArray, findTargetPosition, addFieldSetting, removeFieldSetting, 
+  updateFieldSetting, sanitizeTaskDescriptions 
+} from './logic.js';
+
 
 export const useTaskApp = () => {
   const { ref } = Vue;
@@ -11,19 +16,27 @@ export const useTaskApp = () => {
   ];
 
   const tasks = ref([
-    { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20' },
-    { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13' },
-    { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18' },
-    { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10' },
-    { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12' },
-    { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25' },
-    { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14' },
-    { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19' },
-    { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
-    { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
-    { id: 11, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' },
-    { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15' }
+    { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20', descriptions: { desc_1: 'Old description mapped to new format.' } },
+    { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13', descriptions: { desc_1: '' } },
+    { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18', descriptions: { desc_1: '' } },
+    { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10', descriptions: { desc_1: '' } },
+    { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12', descriptions: { desc_1: '' } },
+    { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25', descriptions: { desc_1: '' } },
+    { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14', descriptions: { desc_1: '' } },
+    { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19', descriptions: { desc_1: '' } },
+    { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
+    { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
+    { id: 11, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
+    { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } }
   ]);
+
+  // 設定状態の管理
+  const descriptionSettings = ref([
+    { id: 'desc_1', title: 'Description' }
+  ]);
+  const isSettingsModalOpen = ref(false);
+  const settingsDraft = ref([]);
+
 
   const isModalOpen = ref(false);
   const isEditing = ref(false);
@@ -36,8 +49,44 @@ export const useTaskApp = () => {
     priority: 'medium',
     assignee: '',
     dueDate: '',
-    description: ''
+    descriptions: {}
   });
+
+  // Settings Modal Functions
+  const openSettingsModal = () => {
+    // ディープコピーでドラフトを作成
+    settingsDraft.value = JSON.parse(JSON.stringify(descriptionSettings.value));
+    isSettingsModalOpen.value = true;
+  };
+
+  const closeSettingsModal = () => {
+    isSettingsModalOpen.value = false;
+  };
+
+  const saveSettings = () => {
+    descriptionSettings.value = [...settingsDraft.value];
+    
+    // 既存タスクのサニタイズ（不要なDescriptionを削除する）
+    tasks.value = tasks.value.map(task => ({
+      ...task,
+      descriptions: sanitizeTaskDescriptions(task.descriptions, descriptionSettings.value)
+    }));
+
+    closeSettingsModal();
+  };
+
+  const draftAddField = () => {
+    settingsDraft.value = addFieldSetting(settingsDraft.value, `New Field ${settingsDraft.value.length + 1}`);
+  };
+
+  const draftRemoveField = (id) => {
+    settingsDraft.value = removeFieldSetting(settingsDraft.value, id);
+  };
+
+  const draftUpdateField = (id, newTitle) => {
+    settingsDraft.value = updateFieldSetting(settingsDraft.value, id, newTitle);
+  };
+
 
   const getTasksByStatus = (status) => filterTasksByStatus(tasks.value, status);
 
@@ -61,9 +110,24 @@ export const useTaskApp = () => {
   const openModal = (task = null) => {
     if (task) {
       isEditing.value = true;
-      currentTask.value = { ...task };
+      // descriptionsがない古いデータへの後方互換
+      const taskDescriptions = task.descriptions || {};
+      if (task.description && Object.keys(taskDescriptions).length === 0) {
+          taskDescriptions['desc_1'] = task.description;
+      }
+
+      currentTask.value = { 
+        ...task,
+        descriptions: { ...taskDescriptions }
+      };
     } else {
       isEditing.value = false;
+      
+      const newDescriptions = {};
+      descriptionSettings.value.forEach(s => {
+        newDescriptions[s.id] = '';
+      });
+
       currentTask.value = {
         id: null,
         key: `NEW-${tasks.value.length + 1}`,
@@ -72,7 +136,7 @@ export const useTaskApp = () => {
         priority: 'medium',
         assignee: 'ME',
         dueDate: '',
-        description: ''
+        descriptions: newDescriptions
       };
     }
     isModalOpen.value = true;
@@ -84,20 +148,28 @@ export const useTaskApp = () => {
 
   const saveTask = () => {
     if (!currentTask.value.title) return alert('Title is required');
+    
+    // 保存前に設定に存在しない不要なDescriptionをサニタイズ
+    const sanitizedDescriptions = sanitizeTaskDescriptions(currentTask.value.descriptions, descriptionSettings.value);
+    const taskToSave = { ...currentTask.value, descriptions: sanitizedDescriptions };
+    // 古いフィールドがあれば削除
+    delete taskToSave.description;
+
     if (isEditing.value) {
-      const index = tasks.value.findIndex(t => t.id === currentTask.value.id);
+      const index = tasks.value.findIndex(t => t.id === taskToSave.id);
       if (index !== -1) {
-        tasks.value[index] = { ...currentTask.value };
+        tasks.value[index] = taskToSave;
       }
     } else {
       tasks.value.push({
-        ...currentTask.value,
+        ...taskToSave,
         id: generateTaskId(),
         key: generateTaskKey(tasks.value.length)
       });
     }
     closeModal();
   };
+
 
   const nextStatus = (task) => {
     task.status = getNextStatus(task.status);
@@ -123,6 +195,15 @@ export const useTaskApp = () => {
     onDragStart,
     onDrop,
     draggedTaskId,
-    quickMove
+    quickMove,
+    descriptionSettings,
+    isSettingsModalOpen,
+    settingsDraft,
+    openSettingsModal,
+    closeSettingsModal,
+    saveSettings,
+    draftAddField,
+    draftRemoveField,
+    draftUpdateField
   };
 };
