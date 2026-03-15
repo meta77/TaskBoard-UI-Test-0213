@@ -111,3 +111,42 @@ export const getNextStatus = (currentStatus) => {
   const index = flow.indexOf(currentStatus);
   return flow[(index + 1) % flow.length];
 };
+
+/**
+ * 新しい設定フィールドを追加する (最大3つ)
+ */
+export const addFieldSetting = (settings, newTitle) => {
+  if (settings.length >= 3) return settings;
+  const newId = `desc_${Date.now()}`;
+  return [...settings, { id: newId, title: newTitle }];
+};
+
+/**
+ * 指定した設定フィールドを削除する
+ */
+export const removeFieldSetting = (settings, fieldId) => {
+  if (settings.length <= 1) return settings; // 最低1つは残す
+  return settings.filter(s => s.id !== fieldId);
+};
+
+/**
+ * 指定した設定フィールドのタイトルを更新する
+ */
+export const updateFieldSetting = (settings, fieldId, newTitle) => {
+  return settings.map(s => s.id === fieldId ? { ...s, title: newTitle } : s);
+};
+
+/**
+ * 現在のフィールド設定に基づいて、不要な Description を削減（サニタイズ）する
+ */
+export const sanitizeTaskDescriptions = (descriptions, settings) => {
+  if (!descriptions) return {};
+  const validIds = new Set(settings.map(s => s.id));
+  const newDescriptions = {};
+  for (const [key, value] of Object.entries(descriptions)) {
+    if (validIds.has(key)) {
+      newDescriptions[key] = value;
+    }
+  }
+  return newDescriptions;
+};
