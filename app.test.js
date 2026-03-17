@@ -74,4 +74,26 @@ describe('App Logic (useTaskApp)', () => {
     const todoTasks = app.tasks.value.filter(t => t.status === 'todo');
     expect(todoTasks[0].id).toBe(taskToMove.id);
   });
+
+  it('何も選ばずにドロップした場合は無視されること', () => {
+    const initialTasks = [...app.tasks.value];
+    
+    // onDragStart を呼ばずにいきなりドロップ
+    app.onDrop({ preventDefault: () => {} }, 'todo', 2);
+    
+    // タスクの配列が全く同じであること
+    expect(app.tasks.value).toEqual(initialTasks);
+  });
+
+  it('元の位置と同じ場所（自分自身の上）にドロップした場合はデータがおかしくならないこと', () => {
+    const taskToMove = app.tasks.value[0]; // SYS-101
+    const initialTasks = [...app.tasks.value];
+    
+    app.onDragStart(taskToMove.id);
+    // ターゲットとして自分自身を指定
+    app.onDrop({ preventDefault: () => {} }, 'backlog', taskToMove.id);
+    
+    // タスクの配列が元と変わっていないこと（配列が破壊されていないこと）
+    expect(app.tasks.value).toEqual(initialTasks);
+  });
 });

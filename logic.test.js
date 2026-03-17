@@ -80,7 +80,18 @@ import {
       const result = moveTaskInArray(tasks, 1, 'todo', null);
       expect(result[1].id).toBe(1);
     });
+
+    it('は、移動対象とターゲットが同じIDの場合、元の配列を変更せずに返すこと', () => {
+      const tasks = [
+        { id: 1, status: 'todo' },
+        { id: 2, status: 'todo' },
+        { id: 3, status: 'done' }
+      ];
+      const result = moveTaskInArray(tasks, 2, 'todo', 2);
+      expect(result).toEqual(tasks);
+    });
   });
+
 
   describe('findTargetPosition', () => {
     const tasks = [

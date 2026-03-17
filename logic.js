@@ -38,7 +38,10 @@ export const generateTaskKey = (taskCount) => {
  * @param {number|null} targetTaskId - どのタスクの前に挿入するか（nullなら一番後ろ）
  */
 export const moveTaskInArray = (tasks, taskId, targetStatus, targetTaskId) => {
+  if (taskId === targetTaskId) return tasks;
+  
   const newTasks = [...tasks];
+
 
   // 1. 移動対象のタスクを取得して一時削除
   const taskIndex = newTasks.findIndex(t => t.id === taskId);
