@@ -1,19 +1,19 @@
 import { 
   filterTasksByStatus, getTaskKey, generateTaskId, generateTaskKey, getNextStatus, 
   moveTaskInArray, findTargetPosition, addFieldSetting, removeFieldSetting, 
-  updateFieldSetting, sanitizeTaskDescriptions 
+  updateFieldSetting, sanitizeTaskDescriptions,
+  addColumnSetting, removeColumnSetting, updateColumnSetting, sanitizeTaskStatuses
 } from './logic.js';
-
 
 export const useTaskApp = () => {
   const { ref } = Vue;
-  const columns = [
+  const columns = ref([
     { id: 'backlog', name: 'Backlog' },
     { id: 'todo', name: 'To Do' },
     { id: 'in-progress', name: 'In Progress' },
     { id: 'review', name: 'Review' },
     { id: 'done', name: 'Done' }
-  ];
+  ]);
 
   const tasks = ref([
     { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20', descriptions: { desc_1: 'Old description mapped to new format.' } },
@@ -36,7 +36,7 @@ export const useTaskApp = () => {
   ]);
   const isSettingsModalOpen = ref(false);
   const settingsDraft = ref([]);
-
+  const columnsDraft = ref([]);
 
   const isModalOpen = ref(false);
   const isEditing = ref(false);
@@ -56,6 +56,7 @@ export const useTaskApp = () => {
   const openSettingsModal = () => {
     // ディープコピーでドラフトを作成
     settingsDraft.value = JSON.parse(JSON.stringify(descriptionSettings.value));
+    columnsDraft.value = JSON.parse(JSON.stringify(columns.value));
     isSettingsModalOpen.value = true;
   };
 
@@ -65,12 +66,16 @@ export const useTaskApp = () => {
 
   const saveSettings = () => {
     descriptionSettings.value = [...settingsDraft.value];
+    columns.value = [...columnsDraft.value];
     
     // 既存タスクのサニタイズ（不要なDescriptionを削除する）
-    tasks.value = tasks.value.map(task => ({
+    let updatedTasks = tasks.value.map(task => ({
       ...task,
       descriptions: sanitizeTaskDescriptions(task.descriptions, descriptionSettings.value)
     }));
+
+    // 列設定の変更によるサニタイズ（削除された列のタスクを左端へ移動）
+    tasks.value = sanitizeTaskStatuses(updatedTasks, columns.value);
 
     closeSettingsModal();
   };
@@ -85,6 +90,18 @@ export const useTaskApp = () => {
 
   const draftUpdateField = (id, newTitle) => {
     settingsDraft.value = updateFieldSetting(settingsDraft.value, id, newTitle);
+  };
+
+  const draftAddColumn = () => {
+    columnsDraft.value = addColumnSetting(columnsDraft.value, `New Column`);
+  };
+
+  const draftRemoveColumn = (id) => {
+    columnsDraft.value = removeColumnSetting(columnsDraft.value, id);
+  };
+
+  const draftUpdateColumn = (id, newTitle) => {
+    columnsDraft.value = updateColumnSetting(columnsDraft.value, id, newTitle);
   };
 
 
@@ -102,7 +119,7 @@ export const useTaskApp = () => {
   };
 
   const quickMove = (taskId, direction) => {
-    const target = findTargetPosition(tasks.value, taskId, direction);
+    const target = findTargetPosition(tasks.value, taskId, direction, columns.value);
     if (!target) return;
     tasks.value = moveTaskInArray(tasks.value, taskId, target.status, target.targetTaskId);
   };
@@ -172,7 +189,7 @@ export const useTaskApp = () => {
 
 
   const nextStatus = (task) => {
-    task.status = getNextStatus(task.status);
+    task.status = getNextStatus(task.status, columns.value);
   };
 
   const addTask = () => {
@@ -204,6 +221,10 @@ export const useTaskApp = () => {
     saveSettings,
     draftAddField,
     draftRemoveField,
-    draftUpdateField
+    draftUpdateField,
+    columnsDraft,
+    draftAddColumn,
+    draftRemoveColumn,
+    draftUpdateColumn
   };
 };

@@ -66,12 +66,10 @@ export const moveTaskInArray = (tasks, taskId, targetStatus, targetTaskId) => {
   return newTasks;
 };
 
-const columnFlow = ['backlog', 'todo', 'in-progress', 'review', 'done'];
-
 /**
  * 相対的な方向から移動先を特定する
  */
-export const findTargetPosition = (tasks, taskId, direction) => {
+export const findTargetPosition = (tasks, taskId, direction, columns) => {
   const task = tasks.find(t => t.id === taskId);
   if (!task) return null;
 
@@ -92,7 +90,10 @@ export const findTargetPosition = (tasks, taskId, direction) => {
     return { status: currentStatus, targetTaskId: nextNextTask ? nextNextTask.id : null };
   }
 
+  // extract column ids for horizontal movement
+  const columnFlow = columns.map(c => c.id);
   const colIndex = columnFlow.indexOf(currentStatus);
+  
   if (direction === 'left') {
     if (colIndex <= 0) return null;
     return { status: columnFlow[colIndex - 1], targetTaskId: null };
@@ -109,10 +110,52 @@ export const findTargetPosition = (tasks, taskId, direction) => {
 /**
  * ステータスを遷移させる
  */
-export const getNextStatus = (currentStatus) => {
-  const flow = ['backlog', 'todo', 'in-progress', 'review', 'done'];
+export const getNextStatus = (currentStatus, columns) => {
+  const flow = columns.map(c => c.id);
   const index = flow.indexOf(currentStatus);
+  // もし現在のステータスが見つからなければ先頭のステータスにする
+  if (index === -1) return flow[0];
   return flow[(index + 1) % flow.length];
+};
+
+/**
+ * 新しい列設定を追加する (最大7つ)
+ */
+export const addColumnSetting = (columns, newName) => {
+  if (columns.length >= 7) return columns;
+  const newId = `col_${Date.now()}`;
+  return [...columns, { id: newId, name: newName }];
+};
+
+/**
+ * 指定した列設定を削除する
+ */
+export const removeColumnSetting = (columns, colId) => {
+  if (columns.length <= 1) return columns; // 最低1つは残す
+  return columns.filter(c => c.id !== colId);
+};
+
+/**
+ * 指定した列設定の名称を更新する
+ */
+export const updateColumnSetting = (columns, colId, newName) => {
+  return columns.map(c => c.id === colId ? { ...c, name: newName } : c);
+};
+
+/**
+ * 設定変更によって存在しなくなった列（ステータス）のタスクを
+ * 強制的に一番左の列（先頭）に移動（サニタイズ）する
+ */
+export const sanitizeTaskStatuses = (tasks, columns) => {
+  const validIds = new Set(columns.map(c => c.id));
+  const fallbackStatus = columns[0].id;
+  
+  return tasks.map(task => {
+    if (!validIds.has(task.status)) {
+      return { ...task, status: fallbackStatus };
+    }
+    return task;
+  });
 };
 
 /**
