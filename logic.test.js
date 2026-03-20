@@ -1,8 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { 
   filterTasksByStatus, getTaskKey, generateTaskKey, getNextStatus, moveTaskInArray, findTargetPosition, 
-  addFieldSetting, removeFieldSetting, updateFieldSetting, sanitizeTaskDescriptions 
+  addFieldSetting, removeFieldSetting, updateFieldSetting, sanitizeTaskDescriptions,
+  addColumnSetting, removeColumnSetting, updateColumnSetting, sanitizeTaskStatuses
 } from './logic.js';
+
+const mockColumns = [
+  { id: 'backlog', name: 'Backlog' },
+  { id: 'todo', name: 'To Do' },
+  { id: 'in-progress', name: 'In Progress' },
+  { id: 'review', name: 'Review' },
+  { id: 'done', name: 'Done' }
+];
 
 
   describe('filterTasksByStatus', () => {
@@ -44,8 +53,12 @@ import {
 
   describe('getNextStatus', () => {
     it('は、ステータスを次の段階へ進めること', () => {
-      expect(getNextStatus('backlog')).toBe('todo');
-      expect(getNextStatus('review')).toBe('done');
+      expect(getNextStatus('backlog', mockColumns)).toBe('todo');
+      expect(getNextStatus('review', mockColumns)).toBe('done');
+    });
+    
+    it('は、現在のステータスが見つからなければ先頭のステータスにすること', () => {
+      expect(getNextStatus('unknown', mockColumns)).toBe('backlog');
     });
   });
 
@@ -101,21 +114,88 @@ import {
     ];
 
     it('は、上に移動するターゲットを正しく計算すること', () => {
-      const target = findTargetPosition(tasks, 2, 'up');
+      const target = findTargetPosition(tasks, 2, 'up', mockColumns);
       expect(target.status).toBe('backlog');
       expect(target.targetTaskId).toBe(1);
     });
 
     it('は、一番上のタスクをさらに上に移動できないこと', () => {
-      expect(findTargetPosition(tasks, 1, 'up')).toBeNull();
+      expect(findTargetPosition(tasks, 1, 'up', mockColumns)).toBeNull();
     });
 
     it('は、右のステータスへの移動を正しく計算すること', () => {
-      const target = findTargetPosition(tasks, 1, 'right');
+      const target = findTargetPosition(tasks, 1, 'right', mockColumns);
       expect(target.status).toBe('todo');
       expect(target.targetTaskId).toBeNull(); // 列移動は最後尾へ
+    });
   });
 
+  describe('Column Settings Logic', () => {
+    describe('addColumnSetting', () => {
+      it('は、新しい列を追加すること', () => {
+        const columns = [{ id: 'col_1', name: 'Col 1' }];
+        const newCols = addColumnSetting(columns, 'New Col');
+        expect(newCols).toHaveLength(2);
+        expect(newCols[1].name).toBe('New Col');
+        expect(newCols[1].id).toMatch(/^col_\d+$/);
+      });
+
+      it('は、最大7つまでしか追加しないこと', () => {
+        const columns = [
+          { id: '1', name: 'A' }, { id: '2', name: 'B' }, { id: '3', name: 'C' },
+          { id: '4', name: 'D' }, { id: '5', name: 'E' }, { id: '6', name: 'F' },
+          { id: '7', name: 'G' }
+        ];
+        const newCols = addColumnSetting(columns, 'H');
+        expect(newCols).toHaveLength(7);
+        expect(newCols).toEqual(columns);
+      });
+    });
+
+    describe('removeColumnSetting', () => {
+      it('は、指定した列を削除すること', () => {
+        const columns = [{ id: '1', name: 'A' }, { id: '2', name: 'B' }];
+        const newCols = removeColumnSetting(columns, '1');
+        expect(newCols).toHaveLength(1);
+        expect(newCols[0].id).toBe('2');
+      });
+
+      it('は、最低1つの列を残すこと', () => {
+        const columns = [{ id: '1', name: 'A' }];
+        const newCols = removeColumnSetting(columns, '1');
+        expect(newCols).toHaveLength(1);
+        expect(newCols).toEqual(columns);
+      });
+    });
+
+    describe('updateColumnSetting', () => {
+      it('は、指定した列の名称を更新すること', () => {
+        const columns = [{ id: '1', name: 'A' }, { id: '2', name: 'B' }];
+        const newCols = updateColumnSetting(columns, '2', 'Updated B');
+        expect(newCols[1].name).toBe('Updated B');
+        expect(newCols[0].name).toBe('A');
+      });
+    });
+
+    describe('sanitizeTaskStatuses', () => {
+      it('は、存在しないステータスのタスクを一番左の列に移動させること', () => {
+        const tasks = [
+          { id: 1, status: 'valid-col' },
+          { id: 2, status: 'invalid-col' },
+          { id: 3, status: 'another-valid' }
+        ];
+        const columns = [
+          { id: 'leftmost-col', name: 'First' },
+          { id: 'valid-col', name: 'Valid' },
+          { id: 'another-valid', name: 'Another' }
+        ];
+        
+        const sanitized = sanitizeTaskStatuses(tasks, columns);
+        expect(sanitized[0].status).toBe('valid-col');
+        expect(sanitized[1].status).toBe('leftmost-col'); // invalid was moved to leftmost
+        expect(sanitized[2].status).toBe('another-valid');
+      });
+    });
   describe('Field Settings Logic', () => {
     describe('addFieldSetting', () => {
       it('は、新しいフィールドを追加すること', () => {
