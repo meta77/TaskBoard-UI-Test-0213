@@ -16,18 +16,15 @@ export const useTaskApp = () => {
   ]);
 
   const tasks = ref([
-    { id: 1, key: 'SYS-101', title: 'Database schema migration for v2', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20', descriptions: { desc_1: 'Old description mapped to new format.' } },
-    { id: 2, key: 'UI-204', title: 'Refactor zinc color variables', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13', descriptions: { desc_1: '' } },
-    { id: 3, key: 'SEC-042', title: 'OAuth2 implementation check', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18', descriptions: { desc_1: '' } },
-    { id: 4, key: 'DOC-001', title: 'API Documentation v1.0', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10', descriptions: { desc_1: '' } },
-    { id: 5, key: 'TEST-09', title: 'E2E testing with Playwright', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12', descriptions: { desc_1: '' } },
-    { id: 6, key: 'SYS-102', title: 'S3 Bucket policy auditing', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25', descriptions: { desc_1: '' } },
-    { id: 7, key: 'UI-205', title: 'Mobile responsive grid fix', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14', descriptions: { desc_1: '' } },
-    { id: 8, key: 'API-08', title: 'GraphQL rate limiting', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19', descriptions: { desc_1: '' } },
-    { id: 9, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
-    { id: 10, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
-    { id: 11, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
-    { id: 12, key: 'SEC-043', title: 'Secret rotation automation', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } }
+    { id: 1, key: 'SYS-101', title: 'v2に向けたデータベースのスキーマ移行', status: 'backlog', priority: 'high', assignee: 'JD', dueDate: '02.20', descriptions: { desc_1: '新しい形式にマッピングされた以前の説明文' } },
+    { id: 2, key: 'UI-204', title: 'Zincカラー変数のリファクタリング', status: 'in-progress', priority: 'low', assignee: 'SK', dueDate: '02.13', descriptions: { desc_1: '' } },
+    { id: 3, key: 'SEC-042', title: 'OAuth2実装状況の確認', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '02.18', descriptions: { desc_1: '' } },
+    { id: 4, key: 'DOC-001', title: 'APIドキュメント v1.0の作成', status: 'done', priority: 'medium', assignee: 'JD', dueDate: '02.10', descriptions: { desc_1: '' } },
+    { id: 5, key: 'TEST-09', title: 'PlaywrightによるE2Eテストの実施', status: 'in-progress', priority: 'high', assignee: 'TW', dueDate: '02.12', descriptions: { desc_1: '' } },
+    { id: 6, key: 'SYS-102', title: 'S3バケットポリシーの監査', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25', descriptions: { desc_1: '' } },
+    { id: 7, key: 'UI-205', title: 'モバイル・レスポンシブ・グリッドの修正', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14', descriptions: { desc_1: '' } },
+    { id: 8, key: 'API-08', title: 'GraphQLのレート制限の実装', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19', descriptions: { desc_1: '' } },
+    { id: 9, key: 'SEC-043', title: 'シークレットローテーションの自動化', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } }
   ]);
 
   // 設定状態の管理
