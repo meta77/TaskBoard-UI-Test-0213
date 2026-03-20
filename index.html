@@ -26,9 +26,9 @@
 
     <!-- Responsive Board Layout: Mobile (Horizontal Scroll) -> Desktop (Grid) -->
     <div
-      class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 lg:grid lg:grid-cols-5 lg:pb-0 lg:overflow-visible">
+      class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 lg:pb-0">
       <div v-for="col in columns" :key="col.id"
-        class="flex flex-col flex-none w-[85vw] snap-center md:w-[45vw] lg:w-auto">
+        class="flex flex-col flex-none w-[85vw] snap-center md:w-[45vw] lg:w-[320px]">
         <div class="column-header">
           <h2 class="column-title">{{ col.name }}</h2>
           <span class="column-count">{{ getTasksByStatus(col.id).length }}</span>
