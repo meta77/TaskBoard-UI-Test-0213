@@ -24,8 +24,20 @@ export const useTaskApp = () => {
     { id: 6, key: 'SYS-102', title: 'S3バケットポリシーの監査', status: 'backlog', priority: 'low', assignee: 'SK', dueDate: '02.25', descriptions: { desc_1: '' } },
     { id: 7, key: 'UI-205', title: 'モバイル・レスポンシブ・グリッドの修正', status: 'review', priority: 'medium', assignee: 'AN', dueDate: '02.14', descriptions: { desc_1: '' } },
     { id: 8, key: 'API-08', title: 'GraphQLのレート制限の実装', status: 'todo', priority: 'high', assignee: 'JD', dueDate: '02.19', descriptions: { desc_1: '' } },
-    { id: 9, key: 'SEC-043', title: 'シークレットローテーションの自動化', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } }
+    { id: 9, key: 'SEC-043', title: 'シークレットローテーションの自動化', status: 'in-progress', priority: 'medium', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
+    { id: 10, key: 'UI-206', title: 'ダークモードのカラーコントラスト調整', status: 'review', priority: 'low', assignee: 'SK', dueDate: '02.16', descriptions: { desc_1: '' } },
+    { id: 11, key: 'API-09', title: '認証エンドポイントのユニットテスト追加', status: 'todo', priority: 'medium', assignee: 'JD', dueDate: '02.22', descriptions: { desc_1: '' } },
+    { id: 12, key: 'DOC-002', title: 'READMEのデプロイガイド更新', status: 'done', priority: 'low', assignee: 'AN', dueDate: '02.11', descriptions: { desc_1: '' } },
+    { id: 13, key: 'SYS-103', title: 'Redisキャッシュの有効期限ポリシー設定', status: 'backlog', priority: 'high', assignee: 'TW', dueDate: '02.28', descriptions: { desc_1: '' } },
+    { id: 14, key: 'FE-301', title: 'ダッシュボードのグラフコンポーネント実装', status: 'in-progress', priority: 'high', assignee: 'SK', dueDate: '02.14', descriptions: { desc_1: '' } },
+    { id: 15, key: 'SEC-044', title: '脆弱性スキャン結果の修正対応', status: 'todo', priority: 'high', assignee: 'AN', dueDate: '02.17', descriptions: { desc_1: '' } },
+    { id: 16, key: 'TEST-10', title: '負荷テストのシナリオ作成', status: 'backlog', priority: 'medium', assignee: 'JD', dueDate: '03.01', descriptions: { desc_1: '' } },
+    { id: 17, key: 'UI-207', title: 'フォントサイズのアクセシビリティ改善', status: 'review', priority: 'low', assignee: 'TW', dueDate: '02.15', descriptions: { desc_1: '' } },
+    { id: 18, key: 'API-10', title: '外部通知サービスとの連携実装', status: 'in-progress', priority: 'medium', assignee: 'SK', dueDate: '02.18', descriptions: { desc_1: '' } },
+    { id: 19, key: 'DOC-003', title: '開発環境構築フローの動画マニュアル作成', status: 'todo', priority: 'low', assignee: 'JD', dueDate: '02.24', descriptions: { desc_1: '' } },
+    { id: 20, key: 'SYS-104', title: 'ログ出力の構造化（JSON形式）対応', status: 'done', priority: 'medium', assignee: 'AN', dueDate: '02.12', descriptions: { desc_1: '' } }
   ]);
+
 
   // 設定状態の管理
   const descriptionSettings = ref([
