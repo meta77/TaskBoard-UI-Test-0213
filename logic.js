@@ -196,3 +196,13 @@ export const sanitizeTaskDescriptions = (descriptions, settings) => {
   }
   return newDescriptions;
 };
+
+/**
+ * ISO 形式（YYYY-MM-DD）の日付を「MM.DD」形式に変換する
+ */
+export const formatDisplayDate = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return dateStr;
+  return `${parts[1]}.${parts[2]}`;
+};
