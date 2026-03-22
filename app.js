@@ -36,7 +36,10 @@ export const useTaskApp = () => {
     { id: 17, key: 'UI-207', title: 'フォントサイズのアクセシビリティ改善', status: 'review', priority: 'low', assignee: 'TW', dueDate: '2026-02-15', descriptions: { desc_1: '' } },
     { id: 18, key: 'API-10', title: '外部通知サービスとの連携実装', status: 'in-progress', priority: 'medium', assignee: 'SK', dueDate: '2026-02-18', descriptions: { desc_1: '' } },
     { id: 19, key: 'DOC-003', title: '開発環境構築フローの動画マニュアル作成', status: 'todo', priority: 'low', assignee: 'JD', dueDate: '2026-02-24', descriptions: { desc_1: '' } },
-    { id: 20, key: 'SYS-104', title: 'ログ出力の構造化（JSON形式）対応', status: 'done', priority: 'medium', assignee: 'AN', dueDate: '2026-02-12', descriptions: { desc_1: '' } }
+    { id: 20, key: 'SYS-104', title: 'ログ出力の構造化（JSON形式）対応', status: 'done', priority: 'medium', assignee: 'AN', dueDate: '2026-02-12', descriptions: { desc_1: '' } },
+    { id: 21, key: 'REF-010', title: 'コードのクリーンアップとリファクタリング', status: 'todo', priority: 'low', assignee: 'SK', dueDate: '2026-03-05', descriptions: { desc_1: '' } },
+    { id: 22, key: 'DOC-104', title: '新規ユーザー向けオンボーディング資料の作成', status: 'todo', priority: 'medium', assignee: 'AN', dueDate: '2026-03-10', descriptions: { desc_1: '' } },
+    { id: 23, key: 'SEC-050', title: 'セキュリティ脆弱性スキャン結果のレビュー', status: 'todo', priority: 'high', assignee: 'TW', dueDate: '2026-03-12', descriptions: { desc_1: '' } }
   ]);
 
 
