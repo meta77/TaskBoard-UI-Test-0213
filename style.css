@@ -295,6 +295,10 @@ label {
 .form-input[type="date"] {
   position: relative;
   min-height: 45px; /* Ensure height consistency */
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  box-sizing: border-box;
 }
 
 /* Chrome, Safari, Edge - Adjust calendar icon for dark theme */
