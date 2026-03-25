@@ -171,7 +171,7 @@
 
           <div>
             <h3 class="text-zinc-200 font-medium mb-2">列設定 (最大7つ)</h3>
-            <p class="text-zinc-500 text-sm mb-4">ボードの列（ステータス）を設定します。 <br/><span class="text-amber-500/80">警告: 列を削除すると、その列にあるタスクは一番左の列に移動されます。</span></p>
+            <p class="text-zinc-500 text-sm mb-4">ボードの列（ステータス）を設定します。 <br/><span class="text-amber-500/80">列を削除すると、その列にあるタスクは一番左の列に移動します。</span></p>
 
             <div class="space-y-3">
               <div v-for="(col, index) in columnsDraft" :key="col.id" class="flex gap-2 items-center">
@@ -206,7 +206,7 @@
 
         <div class="modal-footer">
           <button @click="closeSettingsModal" class="btn-cancel">キャンセル</button>
-          <button @click="saveSettings" class="btn-save">設定を保存</button>
+          <button @click="saveSettings" class="btn-save">保存</button>
         </div>
       </div>
     </div>
