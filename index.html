@@ -130,14 +130,14 @@
     <div v-if="isSettingsModalOpen" class="modal-overlay" @click.self="closeSettingsModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Board Settings</h2>
+          <h2 class="modal-title">ボード設定</h2>
           <button @click="closeSettingsModal" class="modal-close">&times;</button>
         </div>
 
         <div class="modal-body">
           <div class="mb-4 pb-4 border-b border-zinc-800/50">
-            <h3 class="text-zinc-200 font-medium mb-2">Description Fields (Max 3)</h3>
-            <p class="text-zinc-500 text-sm mb-4">Configure custom description fields for cards.</p>
+            <h3 class="text-zinc-200 font-medium mb-2">入力フィールド設定 (最大3つ)</h3>
+            <p class="text-zinc-500 text-sm mb-4">カードに表示するカスタム入力フィールドを設定します。</p>
 
             <div class="space-y-3">
               <div v-for="(field, index) in settingsDraft" :key="field.id" class="flex gap-2 items-center">
@@ -146,7 +146,7 @@
                   :value="field.title"
                   @input="draftUpdateField(field.id, $event.target.value)"
                   class="form-input flex-1"
-                  placeholder="Field Title"
+                  placeholder="フィールド名"
                 />
                 <button
                   @click="draftRemoveField(field.id)"
@@ -165,13 +165,13 @@
               @click="draftAddField"
               class="mt-4 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
-              <span>+ Add Field</span>
+              <span>+ フィールドを追加</span>
             </button>
           </div>
 
           <div>
-            <h3 class="text-zinc-200 font-medium mb-2">Column Settings (Max 7)</h3>
-            <p class="text-zinc-500 text-sm mb-4">Configure the columns on your board. <br/><span class="text-amber-500/80">Warning: Removing a column will move its tasks to the leftmost column.</span></p>
+            <h3 class="text-zinc-200 font-medium mb-2">列設定 (最大7つ)</h3>
+            <p class="text-zinc-500 text-sm mb-4">ボードの列（ステータス）を設定します。 <br/><span class="text-amber-500/80">警告: 列を削除すると、その列にあるタスクは一番左の列に移動されます。</span></p>
 
             <div class="space-y-3">
               <div v-for="(col, index) in columnsDraft" :key="col.id" class="flex gap-2 items-center">
@@ -180,7 +180,7 @@
                   :value="col.name"
                   @input="draftUpdateColumn(col.id, $event.target.value)"
                   class="form-input flex-1"
-                  placeholder="Column Name"
+                  placeholder="列名"
                 />
                 <button
                   @click="draftRemoveColumn(col.id)"
@@ -199,14 +199,14 @@
               @click="draftAddColumn"
               class="mt-4 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
-              <span>+ Add Column</span>
+              <span>+ 列を追加</span>
             </button>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button @click="closeSettingsModal" class="btn-cancel">Cancel</button>
-          <button @click="saveSettings" class="btn-save">Save Settings</button>
+          <button @click="closeSettingsModal" class="btn-cancel">キャンセル</button>
+          <button @click="saveSettings" class="btn-save">設定を保存</button>
         </div>
       </div>
     </div>
